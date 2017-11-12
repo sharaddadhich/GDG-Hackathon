@@ -19,12 +19,15 @@ public class HomeScreenActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     FragmentManager fragManager;
     FragmentTransaction fragTxn;
+    public static Double latitude=null,longitude=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
 
+        latitude = getIntent().getDoubleExtra("lat",0.0);
+        longitude = getIntent().getDoubleExtra("long",0.0);
         fragManager = getSupportFragmentManager();
         final HelpFragment helpFragment = new HelpFragment(this);
         fragTxn = fragManager.beginTransaction();
