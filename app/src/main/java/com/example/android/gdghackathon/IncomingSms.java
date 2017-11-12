@@ -50,7 +50,7 @@ public class IncomingSms extends BroadcastReceiver {
 
                     // Show Alert
                     int duration = Toast.LENGTH_LONG;
-                    
+
 
                 } // end for loop
             } // bundle is null

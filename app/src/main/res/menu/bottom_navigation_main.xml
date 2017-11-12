@@ -5,26 +5,25 @@
     <item
         android:id="@+id/help"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/help"
         android:title="Help" />
 
     <item
         android:id="@+id/lost"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/search"
         android:title="Missing" />
 
     <item
         android:id="@+id/found"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/found1"
         android:title="Found" />
 
     <item
         android:id="@+id/tips"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/tips"
         android:title="Tips" />
-
 
 </menu>
