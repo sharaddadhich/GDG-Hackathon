@@ -3,6 +3,7 @@ package com.example.android.gdghackathon.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -11,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.example.android.gdghackathon.R;
 
@@ -19,11 +21,21 @@ public class SplashActivity extends AppCompatActivity {
     LocationManager locman;
     LocationListener loclis;
     Double latitude = null,longitude = null;
+    TextView tvTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        tvTitle = (TextView) findViewById(R.id.title);
+
+        tvTitle = (TextView) findViewById(R.id.title);
+        Typeface typeFace = Typeface.createFromAsset(getAssets(),"fonts/VollkornSC-Regular.ttf");
+        tvTitle.setTypeface(typeFace);
+
+        getSupportActionBar().hide();
+
 
         locman = (LocationManager) getSystemService(LOCATION_SERVICE);
         loclis = new LocationListener() {
