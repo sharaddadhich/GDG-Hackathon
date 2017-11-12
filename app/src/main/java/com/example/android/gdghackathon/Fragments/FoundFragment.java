@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -33,6 +34,7 @@ import com.kairos.KairosListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import static android.app.Activity.RESULT_OK;
@@ -60,6 +62,7 @@ public class FoundFragment extends Fragment {
     Button btnSubmit;
     ProgressDialog progressDialog;
     ScrollView scrollView;
+    Uri imageUri;
 
     public FoundFragment(Context ctx) {
         this.ctx = ctx;
@@ -138,7 +141,7 @@ public class FoundFragment extends Fragment {
                         } else if (which == 1) {
                             Intent i = new Intent(Intent.ACTION_PICK);
                             i.setType("image/*");
-                            startActivityForResult(i, REQUEST_GET_IMAGES);
+                            startActivityForResult(Intent.createChooser(i, "Choose Picture"),REQUEST_GET_IMAGES);
                         }
                     }
                 });
@@ -216,9 +219,17 @@ public class FoundFragment extends Fragment {
         }
 
         if (requestCode == REQUEST_GET_IMAGES && resultCode == RESULT_OK) {
-            bitmap = (Bitmap) data.getExtras().get("data");
-            foundImage.setImageBitmap(bitmap);
-            foundImage.setVisibility(View.VISIBLE);
+
+//            bitmap = (Bitmap) data.getExtras().get("data");
+//            foundImage.setImageBitmap(bitmap);
+//            foundImage.setVisibility(View.VISIBLE);
+            imageUri = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
+                foundImage.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

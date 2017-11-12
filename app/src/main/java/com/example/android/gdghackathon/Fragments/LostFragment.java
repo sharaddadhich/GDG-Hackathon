@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -32,6 +33,7 @@ import com.kairos.KairosListener;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import static android.app.Activity.RESULT_OK;
@@ -49,6 +51,7 @@ public class LostFragment extends Fragment {
     Kairos myKairos;
     KairosListener listener;
     Bitmap photo =null;
+    Uri imageUri;
 
     public static final Integer REQUEST_CAMERA = 101;
     public static final Integer REQUEST_GET_IMAGES = 102;
@@ -131,7 +134,7 @@ public class LostFragment extends Fragment {
                         } else if (which == 1) {
                             Intent i = new Intent(Intent.ACTION_PICK);
                             i.setType("image/*");
-                            startActivityForResult(i, REQUEST_GET_IMAGES);
+                            startActivityForResult(Intent.createChooser(i, "Choose Picture"),REQUEST_GET_IMAGES);
                         }
                     }
                 });
@@ -200,9 +203,14 @@ public class LostFragment extends Fragment {
         }
 
         if (requestCode == REQUEST_GET_IMAGES && resultCode == RESULT_OK) {
-            photo = (Bitmap) data.getExtras().get("data");
-            lostImage.setImageBitmap(photo);
-            lostImage.setVisibility(View.VISIBLE);
+            imageUri = data.getData();
+            try {
+                photo = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
+                lostImage.setImageBitmap(photo);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
