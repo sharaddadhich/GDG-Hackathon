@@ -27,7 +27,12 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.example.android.gdghackathon.Models.Lost;
 import com.example.android.gdghackathon.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 
@@ -53,6 +58,9 @@ public class LostFragment extends Fragment {
     Bitmap photo =null;
     Uri imageUri;
 
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+
     public static final Integer REQUEST_CAMERA = 101;
     public static final Integer REQUEST_GET_IMAGES = 102;
     public static final Integer REQ_CODE = 103;
@@ -74,6 +82,8 @@ public class LostFragment extends Fragment {
 
         myKairos = new Kairos();
         progressDialog = new ProgressDialog(getContext());
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference().child("Lost");
 
         myKairos.setAuthentication(getContext(), app_id, api_key);
 
@@ -85,7 +95,19 @@ public class LostFragment extends Fragment {
                 // your code here!
                 Log.d("KAIROS DEMO", response);
                 progressDialog.dismiss();
-                Toast.makeText(ctx, "Uploaded Successfully!!", Toast.LENGTH_SHORT).show();
+
+                Lost thisLost = new Lost(lostName.getText().toString(),lostMob.getText().toString(),lostClothes.getText().toString());
+                databaseReference.push().setValue(thisLost)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful())
+                                {
+                                    Toast.makeText(ctx, "Uploaded Successfully!!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
                 lostName.setText("");
                 lostClothes.setText("");
                 lostMob.setText("");

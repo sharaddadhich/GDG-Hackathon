@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.telephony.SmsManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,7 +28,13 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.example.android.gdghackathon.Models.Lost;
 import com.example.android.gdghackathon.R;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 
@@ -64,6 +71,9 @@ public class FoundFragment extends Fragment {
     ScrollView scrollView;
     Uri imageUri;
 
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+
     public FoundFragment(Context ctx) {
         this.ctx = ctx;
     }
@@ -71,6 +81,10 @@ public class FoundFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference().child("Lost");
+
         myKairos = new Kairos();
         progressDialog = new ProgressDialog(getContext());
 
@@ -84,7 +98,6 @@ public class FoundFragment extends Fragment {
                 // your code here!
                 Log.d("KAIROS DEMO", response);
                 progressDialog.dismiss();
-                Toast.makeText(ctx, "Uploaded Successfully!!", Toast.LENGTH_SHORT).show();
                 foundClothes.setText("");
                 foundDescription.setText("");
                 foundImage.setImageResource(R.drawable.nopicc);
@@ -92,8 +105,40 @@ public class FoundFragment extends Fragment {
                 try {
                     JSONObject json = new JSONObject(response);
                     Log.d(TAG, "onSuccess: "+json.getJSONArray("images").getJSONObject(0).getJSONObject("transaction").getString("subject_id"));
-                    String recognisedName = json.getJSONArray("images").getJSONObject(0).getJSONObject("transaction").getString("subject_id");
+                    final String recognisedName = json.getJSONArray("images").getJSONObject(0).getJSONObject("transaction").getString("subject_id");
                     Toast.makeText(getContext(),"Recognised As : "+recognisedName, Toast.LENGTH_SHORT).show();
+                    databaseReference.addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            Lost thisLost = dataSnapshot.getValue(Lost.class);
+                            if(thisLost.getName().equals(recognisedName))
+                            {
+                                Log.d(TAG, "onChildAdded: " + thisLost.getMobileNo());
+                                SmsManager smsManager = SmsManager.getDefault();
+                                smsManager.sendTextMessage(thisLost.getMobileNo(),null,"Found " +thisLost.getName()+ " at  28.6184°, 77.3726° \n Team Khoj",null,null);
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -249,4 +294,10 @@ public class FoundFragment extends Fragment {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
+    public void BuildSms(String phoneno)
+    {
+
+    }
+
 }
